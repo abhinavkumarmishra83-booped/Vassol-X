@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vassol-X | Smart Payment Recovery Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent-blue: #0284c7;
+      --accent-glow: rgba(2, 132, 199, 0.35);
+      --danger: #ef4444;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --app-bg: #e0f2fe;
+    }
+
+    * { box-sizing: border-box; font-family: 'Manrope', sans-serif; margin: 0; padding: 0; }
+    body { 
+      background: var(--app-bg); 
+      color: var(--text-main); 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      position: relative;
+      overflow-x: hidden;
+      transition: background 0.3s ease;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+      padding-bottom: 90px;
+      transition: background 0.3s ease;
+    }
+
+    header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--card-border);
+      background: var(--card-bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--accent-blue);
+    }
+    
+    .menu-wrapper { position: relative; }
+    .hamburger-btn {
+      background: var(--bg-color);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: 45px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 200px;
+      display: none;
+      z-index: 100;
+      overflow: hidden;
+    }
+    .dropdown-menu.active { display: block; }
+    .dropdown-item {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background: var(--bg-color); color: var(--accent-blue); }
+
+    .screen { padding: 16px 20px; flex: 1; display: flex; flex-direction: column; }
+    .hidden { display: none !important; }
+
+    /* Search Bar */
+    .search-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 30px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .search-container i { color: var(--text-muted); font-size: 16px; }
+    .search-container input {
+      border: none;
+      outline: none;
+      background: transparent;
+      width: 100%;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .welcome-card {
+      margin: auto 0;
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+    .welcome-card h1 { font-size: 26px; margin-bottom: 12px; color: var(--text-main); font-weight: 800; }
+    .welcome-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+
+    .btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: none;
+      transition: 0.2s;
+    }
+    .btn-blue { 
+      background: var(--accent-blue); 
+      color: #ffffff; 
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3); 
+    }
+    .btn-blue:hover { opacity: 0.9; }
+    .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--card-border); }
+    .btn-danger { background: var(--danger); color: #ffffff; }
+
+    /* Wallet Card */
+    .wallet-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    .wallet-header { display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+    .wallet-amount { font-size: 28px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+    .wallet-sub { color: var(--text-muted); font-size: 12px; font-weight: 500; }
+
+    /* Action Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .grid-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+    }
+    .grid-icon-box {
+      width: 56px;
+      height: 56px;
+      background: var(--card-bg);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-blue);
+      font-size: 20px;
+      margin-bottom: 8px;
+      transition: 0.2s;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .grid-item:hover .grid-icon-box { background: var(--accent-blue); color: #ffffff; }
+    
+    @keyframes bounceIcon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .animate-recovery-icon {
+      animation: bounceIcon 1.5s infinite ease-in-out;
+    }
+
+    .grid-item span { 
+      font-size: 12px; 
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.2; 
+    }
+
+    /* Glowing Auto Slider */
+    .slider-container {
+      width: 100%;
+      height: 160px; 
+      overflow: hidden;
+      border-radius: 20px;
+      border: 2px solid var(--card-border);
+      margin-bottom: 16px;
+      position: relative;
+      background: var(--card-bg);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .slider-wrapper {
+      display: flex;
+      width: 200%;
+      height: 100%;
+      transition: transform 0.8s ease-in-out;
+    }
+    .slider-wrapper img {
+      width: 50%;
+      height: 100%;
+      object-fit: contain;
+      padding: 6px;
+    }
+
+    /* Section Cards */
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .materials-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--bg-color);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      color: var(--accent-blue);
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .materials-btn:hover { opacity: 0.8; }
+
+    /* Form styling */
+    .form-group { margin-bottom: 16px; text-align: left; }
+    label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent-blue); }
+
+    /* Toggle Switches for Debtor Behaviour */
+    .behaviour-toggles {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 12px 16px;
+      border-radius: 12px;
+      transition: 0.2s;
+    }
+    .toggle-row span { font-size: 13px; font-weight: 700; color: var(--text-main); }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider-toggle {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .slider-toggle:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider-toggle { background-color: var(--accent-blue); }
+    input:checked + .slider-toggle.good-bg { background-color: var(--success); }
+    input:checked + .slider-toggle.bad-bg { background-color: var(--danger); }
+    input:checked + .slider-toggle.neutral-bg { background-color: #eab308; }
+    input:checked + .slider-toggle:before { transform: translateX(20px); }
+
+    .debtor-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .debtor-item:hover { border-color: var(--accent-blue); }
+
+    .status-icon {
+      font-size: 16px;
+      padding: 6px;
+      border-radius: 50%;
+    }
+    .status-icon.recovered { color: var(--success); background: #dcfce7; }
+    .status-icon.pending { color: var(--danger); background: #fee2e2; }
+
+    /* Admin Rectangle User Cards */
+    .admin-user-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      overflow: hidden;
+    }
+    .admin-user-header {
+      padding: 16px;
+      background: var(--bg-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .admin-user-body {
+      padding: 14px;
+      display: none;
+      background: var(--card-bg);
+    }
+    .admin-user-body.active { display: block; }
+
+    .admin-debtor-row {
+      background: var(--bg-color);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Highlight Estimated Time Badge */
+    .estimate-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fef3c7;
+      color: #b45309;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid #fde68a;
+    }
+
+    /* Progress bar */
+    .progress-bar-container {
+      width: 100%;
+      background: #e2e8f0;
+      border-radius: 10px;
+      height: 10px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--success);
+      border-radius: 10px;
+      transition: width 0.4s ease;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* Fixed Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 12px;
+      z-index: 99;
+    }
+    .nav-item {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .nav-item.active, .nav-item:hover { color: var(--accent-blue); }
+    .nav-item i { font-size: 18px; }
+
+    .plus-nav-btn {
+      width: 48px;
+      height: 48px;
+      background: var(--accent-blue);
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+      cursor: pointer;
+      border: none;
+      margin-top: -20px;
+      transition: 0.2s;
+    }
+    .plus-nav-btn:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <header>
+      <div class="logo">
+        <img src="https://plain-apac-prod-public.komododecks.com/202610/20/eW06DprHJ6ofOnvV0hex/image.png" alt="Logo"> Vassol-X
+      </div>
+      <div style="font-size: 13px; font-weight: 700; color: var(--accent-blue);" id="headerUserName">User</div>
+      <div class="menu-wrapper">
+        <button class="hamburger-btn" id="menuToggle">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="dropdown-menu" id="dropdownMenu">
+          <div class="dropdown-item" id="editProfileBtn"><i class="fa-solid fa-user-pen"></i> Edit Name</div>
+          <div class="dropdown-item" id="navAdminPortal"><i class="fa-solid fa-lock"></i> Admin Portal</div>
+          <div class="dropdown-item" id="navLogout" style="color: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 1. WELCOME SCREEN -->
+    <div id="welcomeScreen" class="screen">
+      <div class="welcome-card">
+        <img src="https://plain-apac-prod-public.komododecks.com/202610/20/eW06DprHJ6ofOnvV0hex/image.png" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-bottom: 16px; border: 2px solid var(--accent-blue);" alt="Logo">
+        <h1>Vassol-X</h1>
+        <p>Smart & secure pending payment recovery platform designed for modern businesses.</p>
+        <button class="btn btn-blue" id="getStartedBtn">
+          Get Started <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. AUTH SCREEN -->
+    <div id="authScreen" class="screen hidden">
+      <div class="welcome-card">
+        <img src="https://plain-apac-prod-public.komododecks.com/202610/20/eW06DprHJ6ofOnvV0hex/image.png" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-bottom: 16px; border: 2px solid var(--accent-blue);" alt="Logo">
+        <h1>Sign In 🔐</h1>
+        <p>Choose your Google account to access your dashboard securely.</p>
+        <button class="btn btn-blue" id="googleLoginBtn" style="background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1;">
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="18" alt="Google"> Continue with Google
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. HOME DASHBOARD SCREEN -->
+    <div id="homeScreen" class="screen hidden">
+      <!-- Search Bar -->
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="activeSearchInput" placeholder="Search payee name or phone..." />
+      </div>
+
+      <!-- Live Search Results -->
+      <div id="liveSearchResults" class="hidden" style="margin-bottom: 16px;">
+        <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">SEARCH RESULTS</div>
+        <div id="searchResultsContainer"></div>
+      </div>
+
+      <!-- Dashboard Content -->
+      <div id="dashboardMainContent">
+        <div class="wallet-card">
+          <div class="wallet-header">
+            <span>Total Market Dues</span>
+            <i class="fa-solid fa-chart-pie" style="color: var(--accent-blue);"></i>
+          </div>
+          <div class="wallet-amount" id="totalDuesDisplay">₹0</div>
+          <div class="wallet-sub">Active pending collections tracked</div>
+        </div>
+
+        <!-- Action Grid -->
+        <div class="dashboard-grid">
+          <div class="grid-item" onclick="openNewRequestForm()">
+            <div class="grid-icon-box animate-recovery-icon"><i class="fa-solid fa-file-circle-plus"></i></div>
+            <span>New recovery</span>
+          </div>
+          <div class="grid-item" onclick="openSection('reviewRequests')">
+            <div class="grid-icon-box"><i class="fa-solid fa-clipboard-list"></i></div>
+            <span>Review requests</span>
+          </div>
+          <div class="grid-item" onclick="openSection('trackRecovery')">
+            <div class="grid-icon-box"><i class="fa-solid fa-chart-line"></i></div>
+            <span>Track recovery</span>
+          </div>
+          <div class="grid-item" onclick="openSection('moreSection')">
+            <div class="grid-icon-box"><i class="fa-solid fa-ellipsis"></i></div>
+            <span>More</span>
+          </div>
+        </div>
+
+        <!-- Glowing Auto Image Slider -->
+        <div class="slider-container">
+          <div class="slider-wrapper" id="sliderWrapper">
+            <img src="https://plain-apac-prod-public.komododecks.com/202610/20/0IpLRuvHBZdtOotoOzzI/image.png" alt="Slider 1">
+            <img src="https://plain-apac-prod-public.komododecks.com/202610/20/f2SlExnW3hqg8cbMj50W/image.png" alt="Slider 2">
+          </div>
+        </div>
+
+        <!-- Materials Card -->
+        <div class="wallet-card">
+          <div class="section-title">
+            <i class="fa-solid fa-folder-open" style="color: var(--accent-blue);"></i> Materials
+          </div>
+          <button class="materials-btn" onclick="openCustomerPowerModal()">
+            <i class="fa-solid fa-shield-halved"></i> Customer Recovery Power
+          </button>
+        </div>
+
+        <!-- How to Use It Card -->
+        <div class="wallet-card">
+          <div class="section-title">
+            <i class="fa-solid fa-circle-question" style="color: var(--accent-blue);"></i> How to use it
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Watch quick guide & operational workflows for recovery requests.</p>
+          <button class="materials-btn" style="background: var(--card-bg); border-color: var(--card-border); color: var(--text-main);" onclick="alert('Tutorial guide section coming soon.')">
+            <i class="fa-solid fa-play" style="color: var(--accent-blue);"></i> Learn How to Use
+          </button>
+        </div>
+
+        <!-- Amount Recovered Section -->
+        <div class="wallet-card">
+          <div class="section-title">
+            <i class="fa-solid fa-circle-check" style="color: var(--success);"></i> Amount Recovered
+          </div>
+          <div style="font-size: 22px; font-weight: 800; color: var(--success); margin-bottom: 4px;" id="totalRecoveredDisplay">₹0</div>
+          <p style="font-size: 12px; color: var(--text-muted);">Successfully settled recovery records will be tracked here.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3.5 MORE SECTION (Includes Delete Request Option) -->
+    <div id="moreSectionScreen" class="screen hidden">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <button class="btn btn-outline" onclick="goHome()" style="width: auto; padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-arrow-left"></i></button>
+        <h2 style="font-size: 18px; font-weight: 800;">More Options</h2>
+      </div>
+      <div class="wallet-card" style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="font-weight: 700; font-size: 14px; color: var(--text-main);">Manage Requests</div>
+        <p style="font-size: 12px; color: var(--text-muted);">Select and permanently delete any recovery request across all databases.</p>
+        <button class="materials-btn" style="background: #fee2e2; color: var(--danger); border-color: #fecaca;" onclick="openDeleteRequestScreen()">
+          <i class="fa-solid fa-trash-can"></i> Delete Request
+        </button>
+      </div>
+    </div>
+
+    <!-- 3.6 DELETE REQUEST SCREEN -->
+    <div id="deleteRequestScreen" class="screen hidden">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <button class="btn btn-outline" onclick="openSection('moreSection')" style="width: auto; padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-arrow-left"></i></button>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--danger);">Delete Recovery Request</h2>
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Select a request below to permanently delete it from user and admin databases:</div>
+      <div id="deleteListContainer">
+        <p style="color: var(--text-muted); text-align: center;">Loading records...</p>
+      </div>
+    </div>
+
+    <!-- 4. NEW RECOVERY SCREEN -->
+    <div id="newRequestScreen" class="screen hidden">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <button class="btn btn-outline" onclick="goHome()" style="width: auto; padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-arrow-left"></i></button>
+        <h2 style="font-size: 18px; font-weight: 800;" id="formScreenTitle">New Recovery Request</h2>
+      </div>
+
+      <form id="debtorForm">
+        <input type="hidden" id="editingDocId" value="">
+        <div class="form-group">
+          <label>Debtor Name</label>
+          <input type="text" id="debtorName" placeholder="e.g. Ramesh Kumar" required />
+        </div>
+        <div class="form-group">
+          <label>WhatsApp Number</label>
+          <input type="tel" id="debtorPhone" placeholder="e.g. 919876543210" required />
+        </div>
+        <div class="form-group">
+          <label>Pending Amount (₹)</label>
+          <input type="number" id="pendingAmount" placeholder="e.g. 5000" required />
+        </div>
+
+        <!-- Debtor Behaviour Responses Toggles -->
+        <label style="margin-bottom: 8px;">Debtor Behaviour Responses</label>
+        <div class="behaviour-toggles">
+          <div class="toggle-row" id="rowGood">
+            <span>Good Response</span>
+            <label class="switch">
+              <input type="checkbox" id="toggleGood">
+              <span class="slider-toggle good-bg"></span>
+            </label>
+          </div>
+          <div class="toggle-row" id="rowBad">
+            <span>Bad Response</span>
+            <label class="switch">
+              <input type="checkbox" id="toggleBad">
+              <span class="slider-toggle bad-bg"></span>
+            </label>
+          </div>
+          <div class="toggle-row" id="rowNeutral">
+            <span>Neutral Response</span>
+            <label class="switch">
+              <input type="checkbox" id="toggleNeutral">
+              <span class="slider-toggle neutral-bg"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Description / Reason Field -->
+        <div class="form-group">
+          <label>Description / Note</label>
+          <textarea id="reason" rows="3" placeholder="e.g. Balance bill payment details..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-blue" id="submitBtn">
+          <i class="fa-solid fa-check"></i> Submit Request
+        </button>
+      </form>
+    </div>
+
+    <!-- 5. REVIEW REQUESTS SCREEN -->
+    <div id="reviewRequestsScreen" class="screen hidden">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <button class="btn btn-outline" onclick="goHome()" style="width: auto; padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-arrow-left"></i></button>
+        <h2 style="font-size: 18px; font-weight: 800;">Review Requests</h2>
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Tap any request to view details or edit within 24 hours.</div>
+      <div id="debtorsListContainer">
+        <p style="color: var(--text-muted); text-align: center;">Loading records...</p>
+      </div>
+    </div>
+
+    <!-- 6. TRACK RECOVERY SCREEN -->
+    <div id="trackRecoveryScreen" class="screen hidden">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <button class="btn btn-outline" onclick="goHome()" style="width: auto; padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-arrow-left"></i></button>
+        <h2 style="font-size: 18px; font-weight: 800;">Track Recovery Progress</h2>
+      </div>
+      <div class="wallet-card" style="margin-bottom: 16px;">
+        <div style="font-weight: 700; margin-bottom: 4px;" id="trackSummaryTitle">Recovery Timeline & Chart</div>
+        <p style="font-size: 12px; color: var(--text-muted);">Tap any active case below to open its full recovery progress chart & estimated timeframe.</p>
+      </div>
+      <div id="trackListContainer">
+        <p style="color: var(--text-muted); text-align: center;">Loading tracking records...</p>
+      </div>
+    </div>
+
+    <!-- 7. CUSTOMER SUPPORT SCREEN (Targeting 8252820115) -->
+    <div id="supportScreen" class="screen hidden">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <button class="btn btn-outline" onclick="goHome()" style="width: auto; padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-arrow-left"></i></button>
+        <h2 style="font-size: 18px; font-weight: 800;">Customer Support</h2>
+      </div>
+      <div class="wallet-card">
+        <div style="font-weight: 700; margin-bottom: 8px;">24/7 Recovery Help Desk</div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Facing issues with payment tracking or recovery reminders?</p>
+        <button class="materials-btn" onclick="window.open('https://wa.me/918252820115?text=Hello%20Vassol-X%20Support', '_blank')">
+          <i class="fa-brands fa-whatsapp" style="color: #22c55e;"></i> Contact Support on WhatsApp
+        </button>
+      </div>
+    </div>
+
+    <!-- 8. ACCOUNT SCREEN -->
+    <div id="accountScreen" class="screen hidden">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <button class="btn btn-outline" onclick="goHome()" style="width: auto; padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-arrow-left"></i></button>
+        <h2 style="font-size: 18px; font-weight: 800;">Account Details</h2>
+      </div>
+      <div class="wallet-card">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <i class="fa-solid fa-user-gear" style="font-size: 24px; color: var(--accent-blue);"></i>
+          <div>
+            <strong id="accountName" style="font-size: 15px; display: block;">User</strong>
+            <span id="accountEmail" style="font-size: 12px; color: var(--text-muted);">user@gmail.com</span>
+          </div>
+        </div>
+        <button class="btn btn-outline" id="accountEditNameBtn" style="margin-bottom: 10px; font-size: 13px;"><i class="fa-solid fa-user-pen"></i> Edit Display Name</button>
+        <button class="btn btn-outline" id="moreLogoutBtn" style="font-size: 13px; padding: 10px; color: var(--danger); border-color: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </div>
+    </div>
+
+    <!-- 9. ADMIN DASHBOARD SCREEN (With Theme Selector & User Rectangles) -->
+    <div id="adminScreen" class="screen hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="font-size: 18px; font-weight: 800;">Admin Dashboard</h2>
+        <button class="btn btn-outline" onclick="goHome()" style="width: auto; padding: 6px 12px; font-size: 12px;">Back</button>
+      </div>
+      
+      <!-- Theme Switcher Card -->
+      <div class="wallet-card" style="padding: 16px; margin-bottom: 16px;">
+        <label style="margin-bottom: 6px; color: var(--text-main);">🎨 Select App Theme (10 Options)</label>
+        <select id="themeSelector" onchange="changeAppTheme(this.value)">
+          <option value="1">1. Blue & White (Classic)</option>
+          <option value="2">2. Light Yellow & White</option>
+          <option value="3">3. Light Green & White</option>
+          <option value="4">4. Dark Executive Mode</option>
+          <option value="5">5. Purple Bliss</option>
+          <option value="6">6. Sunset Orange</option>
+          <option value="7">7. Mint Clean</option>
+          <option value="8">8. Rose Pink</option>
+          <option value="9">9. Slate Charcoal</option>
+          <option value="10">10. Royal Indigo</option>
+        </select>
+      </div>
+
+      <div class="wallet-card" style="padding: 16px; margin-bottom: 16px;">
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Total Market Collections</span>
+        <div style="font-size: 22px; font-weight: 800;" id="adminTotalDues">₹0</div>
+      </div>
+      <div id="adminUsersContainer">
+        <p style="color: var(--text-muted); text-align: center;">Loading admin data...</p>
+      </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 16px; font-weight: 800;">Request Details</h3>
+          <button onclick="closeDetailsModal()" style="background: none; border: none; font-size: 18px; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="modalBodyContent" style="font-size: 13px; color: var(--text-main); display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;"></div>
+        <div id="modalActionContainer"></div>
+      </div>
+    </div>
+
+    <!-- Track Chart Modal -->
+    <div id="trackChartModal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 16px; font-weight: 800;">Recovery Progress Chart</h3>
+          <button onclick="closeTrackChartModal()" style="background: none; border: none; font-size: 18px; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="trackChartModalBody" style="font-size: 13px; color: var(--text-main); display: flex; flex-direction: column; gap: 12px;"></div>
+      </div>
+    </div>
+
+    <!-- Customer Recovery Power Leaderboard Modal -->
+    <div id="customerPowerModal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 16px; font-weight: 800;"><i class="fa-solid fa-trophy" style="color: var(--warning);"></i> Customer Recovery Power</h3>
+          <button onclick="closeCustomerPowerModal()" style="background: none; border: none; font-size: 18px; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Ranked by fastest recovery speed & settlement performance:</p>
+        <div id="customerPowerList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+    </div>
+
+    <!-- Fixed Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="goHome()">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+      </button>
+
+      <button class="nav-item" onclick="openSection('support')">
+        <i class="fa-solid fa-headset"></i>
+        <span>Support</span>
+      </button>
+
+      <!-- Center Floating Plus Button -->
+      <button class="plus-nav-btn" onclick="openNewRequestForm()" title="Add New Recovery">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+
+      <button class="nav-item" onclick="openSection('reviewRequests')">
+        <i class="fa-solid fa-clipboard-list"></i>
+        <span>Requests</span>
+      </button>
+
+      <button class="nav-item" onclick="openSection('account')">
+        <i class="fa-solid fa-user"></i>
+        <span>Account</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- Firebase SDK & Integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAk1LqMBvSPT8S5OrChirmIiDYsvW_v2Sw",
+      authDomain: "vassol-x-al-database.firebaseapp.com",
+      databaseURL: "https://vassol-x-al-database-default-rtdb.firebaseio.com",
+      projectId: "vassol-x-al-database",
+      storageBucket: "vassol-x-al-database.firebasestorage.app",
+      messagingSenderId: "994159912687",
+      appId: "1:994159912687:web:144b8f680f050e6afc1d1a",
+      measurementId: "G-ED8YN9TEVP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const welcomeScreen = document.getElementById("welcomeScreen");
+    const authScreen = document.getElementById("authScreen");
+    const homeScreen = document.getElementById("homeScreen");
+    const moreSectionScreen = document.getElementById("moreSectionScreen");
+    const deleteRequestScreen = document.getElementById("deleteRequestScreen");
+    const newRequestScreen = document.getElementById("newRequestScreen");
+    const reviewRequestsScreen = document.getElementById("reviewRequestsScreen");
+    const trackRecoveryScreen = document.getElementById("trackRecoveryScreen");
+    const supportScreen = document.getElementById("supportScreen");
+    const accountScreen = document.getElementById("accountScreen");
+    const adminScreen = document.getElementById("adminScreen");
+    const detailsModal = document.getElementById("detailsModal");
+    const trackChartModal = document.getElementById("trackChartModal");
+    const customerPowerModal = document.getElementById("customerPowerModal");
+
+    const getStartedBtn = document.getElementById("getStartedBtn");
+    const googleLoginBtn = document.getElementById("googleLoginBtn");
+    const debtorForm = document.getElementById("debtorForm");
+    const menuToggle = document.getElementById("menuToggle");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const navLogout = document.getElementById("navLogout");
+    const moreLogoutBtn = document.getElementById("moreLogoutBtn");
+    const navAdminPortal = document.getElementById("navAdminPortal");
+    const editProfileBtn = document.getElementById("editProfileBtn");
+    const accountEditNameBtn = document.getElementById("accountEditNameBtn");
+    const debtorsListContainer = document.getElementById("debtorsListContainer");
+    const trackListContainer = document.getElementById("trackListContainer");
+    const adminUsersContainer = document.getElementById("adminUsersContainer");
+    const customerPowerList = document.getElementById("customerPowerList");
+    const deleteListContainer = document.getElementById("deleteListContainer");
+
+    const activeSearchInput = document.getElementById("activeSearchInput");
+    const liveSearchResults = document.getElementById("liveSearchResults");
+    const searchResultsContainer = document.getElementById("searchResultsContainer");
+    const dashboardMainContent = document.getElementById("dashboardMainContent");
+
+    // Theme Management (10 Themes)
+    const themes = {
+      1: { bg: "#f8fafc", card: "#ffffff", border: "#e2e8f0", text: "#0f172a", muted: "#64748b", blue: "#0284c7", appBg: "#e0f2fe" },
+      2: { bg: "#fefce8", card: "#ffffff", border: "#fef08a", text: "#713f12", muted: "#a16207", blue: "#ca8a04", appBg: "#fef9c3" },
+      3: { bg: "#f0fdf4", card: "#ffffff", border: "#bbf7d0", text: "#14532d", muted: "#166534", blue: "#16a34a", appBg: "#dcfce7" },
+      4: { bg: "#09090b", card: "#18181b", border: "#27272a", text: "#f4f4f5", muted: "#a1a1aa", blue: "#38bdf8", appBg: "#000000" },
+      5: { bg: "#faf5ff", card: "#ffffff", border: "#f3e8ff", text: "#581c87", muted: "#7e22ce", blue: "#9333ea", appBg: "#f3e8ff" },
+      6: { bg: "#fff7ed", card: "#ffffff", border: "#ffedd5", text: "#7c2d12", muted: "#c2410c", blue: "#ea580c", appBg: "#ffedd5" },
+      7: { bg: "#f0fdfa", card: "#ffffff", border: "#ccfbf1", text: "#134e4a", muted: "#115e59", blue: "#0d9488", appBg: "#ccfbf1" },
+      8: { bg: "#fff1f2", card: "#ffffff", border: "#ffe4e6", text: "#881337", muted: "#9f1239", blue: "#e11d48", appBg: "#ffe4e6" },
+      9: { bg: "#f1f5f9", card: "#ffffff", border: "#cbd5e1", text: "#334155", muted: "#475569", blue: "#475569", appBg: "#e2e8f0" },
+      10: { bg: "#eef2ff", card: "#ffffff", border: "#e0e7ff", text: "#312e81", muted: "#3730a3", blue: "#4f46e5", appBg: "#e0e7ff" }
+    };
+
+    window.changeAppTheme = function(themeId) {
+      const t = themes[themeId] || themes[1];
+      const r = document.documentElement;
+      r.style.setProperty('--bg-color', t.bg);
+      r.style.setProperty('--card-bg', t.card);
+      r.style.setProperty('--card-border', t.border);
+      r.style.setProperty('--text-main', t.text);
+      r.style.setProperty('--text-muted', t.muted);
+      r.style.setProperty('--accent-blue', t.blue);
+      r.style.setProperty('--app-bg', t.appBg);
+      localStorage.setItem("vassol_theme", themeId);
+    };
+
+    const savedTheme = localStorage.getItem("vassol_theme") || "1";
+    if(document.getElementById("themeSelector")) document.getElementById("themeSelector").value = savedTheme;
+    changeAppTheme(savedTheme);
+
+    // Toggle Elements
+    const toggleGood = document.getElementById("toggleGood");
+    const toggleBad = document.getElementById("toggleBad");
+    const toggleNeutral = document.getElementById("toggleNeutral");
+    const rowGood = document.getElementById("rowGood");
+    const rowBad = document.getElementById("rowBad");
+    const rowNeutral = document.getElementById("rowNeutral");
+
+    function handleToggleChange(changedToggle) {
+      if (changedToggle.checked) {
+        if (changedToggle === toggleGood) {
+          toggleBad.checked = false;
+          toggleNeutral.checked = false;
+          rowBad.style.display = "none";
+          rowNeutral.style.display = "none";
+        } else if (changedToggle === toggleBad) {
+          toggleGood.checked = false;
+          toggleNeutral.checked = false;
+          rowGood.style.display = "none";
+          rowNeutral.style.display = "none";
+        } else if (changedToggle === toggleNeutral) {
+          toggleGood.checked = false;
+          toggleBad.checked = false;
+          rowGood.style.display = "none";
+          rowBad.style.display = "none";
+        }
+      } else {
+        rowGood.style.display = "flex";
+        rowBad.style.display = "flex";
+        rowNeutral.style.display = "flex";
+      }
+    }
+
+    toggleGood.addEventListener("change", () => handleToggleChange(toggleGood));
+    toggleBad.addEventListener("change", () => handleToggleChange(toggleBad));
+    toggleNeutral.addEventListener("change", () => handleToggleChange(toggleNeutral));
+
+    let currentUser = null;
+    let customUserName = localStorage.getItem("vassol_username") || "";
+    let allDebtors = [];
+
+    // Auto Image Slider
+    let currentSlide = 0;
+    const sliderWrapper = document.getElementById("sliderWrapper");
+    if(sliderWrapper) {
+      setInterval(() => {
+        currentSlide = (currentSlide + 1) % 2;
+        sliderWrapper.style.transform = `translateX(-${currentSlide * 50}%)`;
+      }, 3500);
+    }
+
+    // Real-Time Search Logic
+    if(activeSearchInput) {
+      activeSearchInput.addEventListener("input", (e) => {
+        const searchTerm = e.target.value.trim().toLowerCase();
+        if (searchTerm.length > 0) {
+          dashboardMainContent.classList.add("hidden");
+          liveSearchResults.classList.remove("hidden");
+          const filtered = allDebtors.filter(d => 
+            (d.debtorName && d.debtorName.toLowerCase().includes(searchTerm)) || 
+            (d.reason && d.reason.toLowerCase().includes(searchTerm)) ||
+            (d.amount && String(d.amount).includes(searchTerm))
+          );
+          renderDebtorsToContainer(filtered, searchResultsContainer);
+        } else {
+          liveSearchResults.classList.add("hidden");
+          dashboardMainContent.classList.remove("hidden");
+        }
+      });
+    }
+
+    window.goHome = function() {
+      [newRequestScreen, reviewRequestsScreen, trackRecoveryScreen, supportScreen, accountScreen, adminScreen, moreSectionScreen, deleteRequestScreen, welcomeScreen, authScreen].forEach(s => s.classList.add("hidden"));
+      homeScreen.classList.remove("hidden");
+      if(activeSearchInput) activeSearchInput.value = "";
+      liveSearchResults.classList.add("hidden");
+      dashboardMainContent.classList.remove("hidden");
+      loadUserStats();
+    };
+
+    window.openNewRequestForm = function() {
+      [homeScreen, reviewRequestsScreen, trackRecoveryScreen, supportScreen, accountScreen, adminScreen, moreSectionScreen, deleteRequestScreen].forEach(s => s.classList.add("hidden"));
+      newRequestScreen.classList.remove("hidden");
+      debtorForm.reset();
+      document.getElementById("editingDocId").value = "";
+      document.getElementById("formScreenTitle").innerText = "New Recovery Request";
+      rowGood.style.display = "flex";
+      rowBad.style.display = "flex";
+      rowNeutral.style.display = "flex";
+    };
+
+    window.openSection = function(section) {
+      [homeScreen, newRequestScreen, reviewRequestsScreen, trackRecoveryScreen, supportScreen, accountScreen, adminScreen, moreSectionScreen, deleteRequestScreen].forEach(s => s.classList.add("hidden"));
+      if (section === 'reviewRequests') {
+        reviewRequestsScreen.classList.remove("hidden");
+        loadUserDebtors();
+      }
+      else if (section === 'trackRecovery') {
+        trackRecoveryScreen.classList.remove("hidden");
+        loadUserTrackRecovery();
+      }
+      else if (section === 'support') supportScreen.classList.remove("hidden");
+      else if (section === 'moreSection') moreSectionScreen.classList.remove("hidden");
+      else if (section === 'account') {
+        accountScreen.classList.remove("hidden");
+        if(currentUser) {
+          document.getElementById("accountName").innerText = customUserName || currentUser.displayName || "User";
+          document.getElementById("accountEmail").innerText = currentUser.email;
+        }
+      }
+    };
+
+    // Open Delete Request Screen & Load User Requests
+    window.openDeleteRequestScreen = async function() {
+      [homeScreen, moreSectionScreen].forEach(s => s.classList.add("hidden"));
+      deleteRequestScreen.classList.remove("hidden");
+      deleteListContainer.innerHTML = `<p style="color:var(--text-muted); text-align:center;">Loading your requests...</p>`;
+      
+      if(!currentUser) return;
+      try {
+        const q = query(collection(db, "pending_recoveries"), where("userId", "==", currentUser.uid));
+        const snapshot = await getDocs(q);
+        let html = "";
+        let docs = [];
+        snapshot.forEach(docSnap => docs.push({ id: docSnap.id, ...docSnap.data() }));
+
+        docs.forEach(d => {
+          html += `
+            <div class="debtor-item" style="border-left: 4px solid var(--danger);">
+              <div>
+                <strong>${d.debtorName}</strong><br>
+                <small style="color:var(--text-muted)">Dues: ₹${(d.amount || 0).toLocaleString('en-IN')} | Phone: ${d.debtorPhone || 'N/A'}</small>
+              </div>
+              <button class="btn btn-danger" style="width: auto; padding: 8px 12px; font-size: 11px;" onclick="confirmAndDeleteRequest('${d.id}')">
+                <i class="fa-solid fa-trash"></i> Delete
+              </button>
+            </div>
+          `;
+        });
+        deleteListContainer.innerHTML = html || `<p style="color:var(--text-muted); text-align:center;">No recovery requests found to delete.</p>`;
+      } catch (err) {
+        deleteListContainer.innerHTML = `<p style="color:var(--danger); text-align:center;">Error loading requests.</p>`;
+      }
+    };
+
+    window.confirmAndDeleteRequest = async function(docId) {
+      if (confirm("Are you sure you want to permanently delete this recovery request? It will be removed from user dashboard and admin portal.")) {
+        try {
+          await deleteDoc(doc(db, "pending_recoveries", docId));
+          alert("Request deleted successfully from database!");
+          openDeleteRequestScreen();
+          loadUserStats();
+        } catch (err) {
+          alert("Failed to delete request: " + err.message);
+        }
+      }
+    };
+
+    getStartedBtn.addEventListener("click", () => {
+      welcomeScreen.classList.add("hidden");
+      authScreen.classList.remove("hidden");
+    });
+
+    menuToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("active");
+    });
+    window.addEventListener("click", () => dropdownMenu.classList.remove("active"));
+
+    googleLoginBtn.addEventListener("click", () => {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider).catch(err => alert(err.message));
+    });
+
+    const handleLogout = () => signOut(auth);
+    navLogout.addEventListener("click", handleLogout);
+    moreLogoutBtn.addEventListener("click", handleLogout);
+
+    const handleEditName = () => {
+      dropdownMenu.classList.remove("active");
+      const newName = prompt("Enter your preferred display name:", customUserName || auth.currentUser?.displayName || "User");
+      if (newName && newName.trim() !== "") {
+        customUserName = newName.trim();
+        localStorage.setItem("vassol_username", customUserName);
+        document.getElementById("headerUserName").innerText = customUserName;
+        if(document.getElementById("accountName")) document.getElementById("accountName").innerText = customUserName;
+        alert("Name updated successfully!");
+      }
+    };
+
+    editProfileBtn.addEventListener("click", handleEditName);
+    if(accountEditNameBtn) accountEditNameBtn.addEventListener("click", handleEditName);
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        const displayName = customUserName || user.displayName || "User";
+        document.getElementById("headerUserName").innerText = displayName;
+
+        welcomeScreen.classList.add("hidden");
+        authScreen.classList.add("hidden");
+        adminScreen.classList.add("hidden");
+        homeScreen.classList.remove("hidden");
+        loadUserStats();
+        loadDebtorsToCache();
+      } else {
+        currentUser = null;
+        [homeScreen, newRequestScreen, reviewRequestsScreen, trackRecoveryScreen, supportScreen, accountScreen, adminScreen, moreSectionScreen, deleteRequestScreen].forEach(s => s.classList.add("hidden"));
+        welcomeScreen.classList.remove("hidden");
+        allDebtors = [];
+      }
+    });
+
+    navAdminPortal.addEventListener("click", () => {
+      dropdownMenu.classList.remove("active");
+      const pass = prompt("Enter Admin Password:");
+      if (pass === "Vassolx") {
+        [welcomeScreen, authScreen, homeScreen, newRequestScreen, reviewRequestsScreen, trackRecoveryScreen, supportScreen, accountScreen, moreSectionScreen, deleteRequestScreen].forEach(s => s.classList.add("hidden"));
+        adminScreen.classList.remove("hidden");
+        loadAdminData();
+      } else if (pass !== null) {
+        alert("Incorrect Password!");
+      }
+    });
+
+    // Customer Recovery Power Leaderboard Modal
+    window.openCustomerPowerModal = async function() {
+      customerPowerList.innerHTML = `<p style="color:var(--text-muted); text-align:center;">Calculating leaderboard...</p>`;
+      customerPowerModal.classList.remove("hidden");
+      try {
+        const snapshot = await getDocs(collection(db, "pending_recoveries"));
+        let debtors = [];
+        snapshot.forEach(docSnap => debtors.push(docSnap.data()));
+
+        debtors.sort((a, b) => {
+          const ratioA = (a.recoveredAmount || 0) / (a.amount || 1);
+          const ratioB = (b.recoveredAmount || 0) / (b.amount || 1);
+          return ratioB - ratioA;
+        });
+
+        let html = "";
+        debtors.forEach((d, index) => {
+          let rankBadge = `#${index + 1}`;
+          let colorBadge = "var(--text-muted)";
+          if(index === 0) { rankBadge = "🥇 1st"; colorBadge = "var(--warning)"; }
+          else if(index === 1) { rankBadge = "🥈 2nd"; colorBadge = "#94a3b8"; }
+          else if(index === 2) { rankBadge = "🥉 3rd"; colorBadge = "#b45309"; }
+
+          const rec = d.recoveredAmount || 0;
+          const tot = d.amount || 1;
+          const pct = Math.min(100, Math.round((rec / tot) * 100));
+
+          html += `
+            <div style="background:var(--bg-color); border:1px solid var(--card-border); padding:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="color:${colorBadge}">${rankBadge} - ${d.debtorName}</strong><br>
+                <small style="color:var(--text-muted)">Client: ${d.userName} | Settled: ₹${rec.toLocaleString('en-IN')}</small>
+              </div>
+              <div style="font-weight:800; color:var(--success); font-size:14px;">${pct}%</div>
+            </div>
+          `;
+        });
+        customerPowerList.innerHTML = html || `<p style="color:var(--text-muted); text-align:center;">No customer data found.</p>`;
+      } catch (err) {
+        customerPowerList.innerHTML = `<p style="color:var(--danger); text-align:center;">Error loading leaderboard.</p>`;
+      }
+    };
+
+    window.closeCustomerPowerModal = function() {
+      customerPowerModal.classList.add("hidden");
+    };
+
+    // Submit / Update Form Handler
+    debtorForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("submitBtn");
+      btn.innerText = "Processing...";
+      btn.disabled = true;
+
+      const activeName = customUserName || currentUser.displayName || "User";
+      let behaviour = "None";
+      if (toggleGood.checked) behaviour = "Good";
+      else if (toggleBad.checked) behaviour = "Bad";
+      else if (toggleNeutral.checked) behaviour = "Neutral";
+
+      const editingId = document.getElementById("editingDocId").value;
+
+      try {
+        if (editingId) {
+          await updateDoc(doc(db, "pending_recoveries", editingId), {
+            debtorName: document.getElementById("debtorName").value,
+            debtorPhone: document.getElementById("debtorPhone").value,
+            amount: Number(document.getElementById("pendingAmount").value),
+            reason: document.getElementById("reason").value,
+            behaviour: behaviour
+          });
+          alert("Request updated successfully!");
+        } else {
+          await addDoc(collection(db, "pending_recoveries"), {
+            userId: currentUser.uid,
+            userEmail: currentUser.email || "No Email",
+            userName: activeName,
+            debtorName: document.getElementById("debtorName").value,
+            debtorPhone: document.getElementById("debtorPhone").value,
+            amount: Number(document.getElementById("pendingAmount").value),
+            reason: document.getElementById("reason").value,
+            behaviour: behaviour,
+            isRecovered: false,
+            estimatedTime: "3 Days",
+            recoveredAmount: 0,
+            createdAt: serverTimestamp()
+          });
+          alert("Recovery request submitted successfully!");
+        }
+
+        debtorForm.reset();
+        await loadDebtorsToCache();
+        openSection('reviewRequests');
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Submit Request`;
+        btn.disabled = false;
+      }
+    });
+
+    function animateValue(id, start, end, duration) {
+      const obj = document.getElementById(id);
+      if(!obj) return;
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const currentVal = Math.floor(progress * (end - start) + start);
+        obj.innerHTML = `₹${currentVal.toLocaleString('en-IN')}`;
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    async function loadUserStats() {
+      try {
+        const q = query(collection(db, "pending_recoveries"), where("userId", "==", currentUser.uid));
+        const snapshot = await getDocs(q);
+        let netDuesSum = 0;
+        let recoveredSum = 0;
+        let count = 0;
+        
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const totalAmt = data.amount || 0;
+          const recAmt = data.recoveredAmount || 0;
+          netDuesSum += Math.max(0, totalAmt - recAmt); // Dynamic reduction as recovery happens
+          recoveredSum += recAmt;
+          count++;
+        });
+
+        animateValue("totalDuesDisplay", 0, netDuesSum, 1200);
+        const recDisplay = document.getElementById("totalRecoveredDisplay");
+        if(recDisplay) recDisplay.innerText = `₹${recoveredSum.toLocaleString('en-IN')}`;
+      } catch (e) { console.log(e); }
+    }
+
+    async function loadDebtorsToCache() {
+      if(!currentUser) return;
+      try {
+        const q = query(collection(db, "pending_recoveries"), where("userId", "==", currentUser.uid));
+        const snapshot = await getDocs(q);
+        allDebtors = [];
+        snapshot.forEach(docSnap => {
+          allDebtors.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        allDebtors.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+      } catch (e) { console.log("Cache load error:", e); }
+    }
+
+    async function loadUserDebtors() {
+      if(!currentUser) return;
+      debtorsListContainer.innerHTML = `<p style="color:var(--text-muted); text-align:center;">Fetching records...</p>`;
+      try {
+        const q = query(collection(db, "pending_recoveries"), where("userId", "==", currentUser.uid));
+        const snapshot = await getDocs(q);
+        let docsArray = [];
+        snapshot.forEach(docSnap => {
+          docsArray.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        allDebtors = docsArray;
+        allDebtors.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        renderDebtorsToContainer(allDebtors, debtorsListContainer);
+      } catch (err) {
+        debtorsListContainer.innerHTML = `<p style="color:var(--danger); text-align:center;">Error: ${err.message}</p>`;
+      }
+    }
+
+    function renderDebtorsToContainer(debtorArray, container) {
+      let html = "";
+      debtorArray.forEach(d => {
+        let badgeColor = "var(--text-muted)";
+        if(d.behaviour === "Good") badgeColor = "var(--success)";
+        else if(d.behaviour === "Bad") badgeColor = "var(--danger)";
+        else if(d.behaviour === "Neutral") badgeColor = "#eab308";
+
+        let timeStr = "Just now";
+        if (d.createdAt && d.createdAt.seconds) {
+          timeStr = new Date(d.createdAt.seconds * 1000).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+        }
+
+        const statusIconClass = d.isRecovered ? "recovered fa-solid fa-check" : "pending fa-solid fa-xmark";
+
+        html += `
+          <div class="debtor-item" onclick='showDebtorDetails(${JSON.stringify(d)})'>
+            <div>
+              <strong>${d.debtorName}</strong> <span style="font-size:10px; padding:2px 6px; border-radius:4px; background:${badgeColor}; color:#fff;">${d.behaviour || 'N/A'}</span><br>
+              <small style="color:var(--text-muted)">₹${d.amount.toLocaleString('en-IN')} | ${timeStr}</small>
+            </div>
+            <div>
+              <i class="status-icon ${statusIconClass}" title="${d.isRecovered ? 'Recovered' : 'Pending'}"></i>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html || `<p style="color:var(--text-muted); text-align:center; margin-top:10px;">No requests found matching.</p>`;
+    }
+
+    async function loadUserTrackRecovery() {
+      if(!currentUser) return;
+      trackListContainer.innerHTML = `<p style="color:var(--text-muted); text-align:center;">Loading tracking timeline...</p>`;
+      try {
+        const q = query(collection(db, "pending_recoveries"), where("userId", "==", currentUser.uid));
+        const snapshot = await getDocs(q);
+        let docsArray = [];
+        snapshot.forEach(docSnap => {
+          docsArray.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        docsArray.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+        let html = "";
+        docsArray.forEach(d => {
+          const recAmount = d.recoveredAmount || 0;
+          const totalAmt = d.amount || 1;
+          const percent = Math.min(100, Math.round((recAmount / totalAmt) * 100));
+          const estTime = d.estimatedTime || "3 Days";
+
+          html += `
+            <div class="debtor-item" style="flex-direction: column; align-items: stretch; gap: 8px;" onclick='showTrackChartModal(${JSON.stringify(d)})'>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <strong>${d.debtorName}</strong><br>
+                  <small style="color:var(--text-muted)">Total Dues: ₹${totalAmt.toLocaleString('en-IN')}</small>
+                </div>
+                <div class="estimate-badge">
+                  <i class="fa-solid fa-clock"></i> ${estTime}
+                </div>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px;">
+                  <span>Recovered: ₹${recAmount.toLocaleString('en-IN')}</span>
+                  <span>${percent}%</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" style="width: ${percent}%;"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        trackListContainer.innerHTML = html || `<p style="color:var(--text-muted); text-align:center; margin-top:10px;">No active tracking cases found.</p>`;
+      } catch (err) {
+        trackListContainer.innerHTML = `<p style="color:var(--danger); text-align:center;">Error: ${err.message}</p>`;
+      }
+    }
+
+    window.showTrackChartModal = function(d) {
+      const modalBody = document.getElementById("trackChartModalBody");
+      const recAmount = d.recoveredAmount || 0;
+      const totalAmt = d.amount || 1;
+      const percent = Math.min(100, Math.round((recAmount / totalAmt) * 100));
+      const estTime = d.estimatedTime || "3 Days";
+
+      modalBody.innerHTML = `
+        <div><strong>Debtor:</strong> ${d.debtorName}</div>
+        <div><strong>Total Amount:</strong> ₹${totalAmt.toLocaleString('en-IN')}</div>
+        <div><strong>Recovered Amount:</strong> <span style="color:var(--success); font-weight:700;">₹${recAmount.toLocaleString('en-IN')}</span></div>
+        <div><strong>Pending Amount:</strong> ₹${Math.max(0, totalAmt - recAmount).toLocaleString('en-IN')}</div>
+        
+        <div style="background: var(--bg-color); padding: 12px; border-radius: 12px; border: 1px solid var(--card-border); text-align: center; margin-top: 8px;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Estimated Time for Recovery</div>
+          <div style="font-size: 18px; font-weight: 800; color: #b45309;"><i class="fa-solid fa-hourglass-half"></i> ${estTime}</div>
+        </div>
+
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 4px;">
+            <span>Progress Breakdown</span>
+            <span>${percent}% Completed</span>
+          </div>
+          <div class="progress-bar-container" style="height: 14px;">
+            <div class="progress-bar-fill" style="width: ${percent}%;"></div>
+          </div>
+        </div>
+      `;
+
+      trackChartModal.classList.remove("hidden");
+    };
+
+    window.closeTrackChartModal = function() {
+      trackChartModal.classList.add("hidden");
+    };
+
+    window.showDebtorDetails = function(d) {
+      const modalBody = document.getElementById("modalBodyContent");
+      const modalAction = document.getElementById("modalActionContainer");
+
+      let timeStr = "N/A";
+      if (d.createdAt && d.createdAt.seconds) {
+        timeStr = new Date(d.createdAt.seconds * 1000).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+      }
+
+      modalBody.innerHTML = `
+        <div><strong>Debtor Name:</strong> ${d.debtorName}</div>
+        <div><strong>Phone Number:</strong> ${d.debtorPhone || 'N/A'}</div>
+        <div><strong>Amount:</strong> ₹${d.amount.toLocaleString('en-IN')}</div>
+        <div><strong>Behaviour:</strong> ${d.behaviour || 'N/A'}</div>
+        <div><strong>Description:</strong> ${d.reason || 'N/A'}</div>
+        <div><strong>Request Date:</strong> ${timeStr}</div>
+        <div><strong>Estimated Time:</strong> <span style="color:#b45309; font-weight:700;">${d.estimatedTime || '3 Days'}</span></div>
+        <div><strong>Status:</strong> <span style="color:${d.isRecovered ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">${d.isRecovered ? 'Recovered (✔️)' : 'Pending (❌)'}</span></div>
+      `;
+
+      let canEdit = false;
+      if (d.createdAt && d.createdAt.seconds) {
+        const diffHours = (Date.now() - (d.createdAt.seconds * 1000)) / (1000 * 60 * 60);
+        if (diffHours <= 24) canEdit = true;
+      }
+
+      if (canEdit) {
+        modalAction.innerHTML = `<button class="btn btn-blue" onclick='editDebtorRequest(${JSON.stringify(d)})'><i class="fa-solid fa-pen"></i> Edit Request (Within 24h)</button>`;
+      } else {
+        modalAction.innerHTML = `<div style="font-size:11px; color:var(--text-muted); text-align:center;">Editing window (24 hours) has expired.</div>`;
+      }
+
+      detailsModal.classList.remove("hidden");
+    };
+
+    window.closeDetailsModal = function() {
+      detailsModal.classList.add("hidden");
+    };
+
+    window.editDebtorRequest = function(d) {
+      closeDetailsModal();
+      [homeScreen, reviewRequestsScreen, trackRecoveryScreen, supportScreen, accountScreen].forEach(s => s.classList.add("hidden"));
+      newRequestScreen.classList.remove("hidden");
+      
+      document.getElementById("formScreenTitle").innerText = "Edit Recovery Request";
+      document.getElementById("editingDocId").value = d.id;
+      document.getElementById("debtorName").value = d.debtorName || "";
+      document.getElementById("debtorPhone").value = d.debtorPhone || "";
+      document.getElementById("pendingAmount").value = d.amount || "";
+      document.getElementById("reason").value = d.reason || "";
+    };
+
+    // Admin Data Loader with User Rectangles Grouping
+    async function loadAdminData() {
+      adminUsersContainer.innerHTML = `<p style="color:var(--text-muted); text-align:center;">Loading cloud records...</p>`;
+      try {
+        const snapshot = await getDocs(collection(db, "pending_recoveries"));
+        let docsArray = [];
+        let totalNetDues = 0;
+
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const tot = data.amount || 0;
+          const rec = data.recoveredAmount || 0;
+          totalNetDues += Math.max(0, tot - rec); // Dynamic reduction
+          docsArray.push({ id: docSnap.id, ...data });
+        });
+
+        document.getElementById("adminTotalDues").innerText = `₹${totalNetDues.toLocaleString('en-IN')}`;
+
+        // Group by userEmail / userId
+        let userMap = {};
+        docsArray.forEach(d => {
+          const key = d.userEmail || d.userId || "Unknown User";
+          if (!userMap[key]) {
+            userMap[key] = {
+              userName: d.userName || "User",
+              userEmail: d.userEmail || "No Email",
+              debtors: []
+            };
+          }
+          userMap[key].debtors.push(d);
+        });
+
+        let html = "";
+        for (const [emailKey, info] of Object.entries(userMap)) {
+          let userTotal = info.debtors.reduce((sum, item) => sum + Math.max(0, (item.amount || 0) - (item.recoveredAmount || 0)), 0);
+          
+          let debtorsHtml = "";
+          info.debtors.forEach(d => {
+            let badgeColor = "var(--text-muted)";
+            if(d.behaviour === "Good") badgeColor = "var(--success)";
+            else if(d.behaviour === "Bad") badgeColor = "var(--danger)";
+            else if(d.behaviour === "Neutral") badgeColor = "#eab308";
+
+            const isChecked = d.isRecovered ? "checked" : "";
+
+            debtorsHtml += `
+              <div class="admin-debtor-row">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong>${d.debtorName}</strong> <span style="font-size:10px; padding:2px 6px; border-radius:4px; background:${badgeColor}; color:#fff;">${d.behaviour || 'N/A'}</span><br>
+                    <small style="color:var(--text-muted)">Phone: ${d.debtorPhone || 'N/A'} | Dues: ₹${(d.amount || 0).toLocaleString('en-IN')}</small><br>
+                    <small style="color:var(--text-muted)">Note: ${d.reason || 'N/A'}</small>
+                  </div>
+                  <div style="text-align: right;">
+                    <label class="switch" title="Toggle Recovery Status (Tick/Cross)">
+                      <input type="checkbox" ${isChecked} onchange="toggleRecoveryStatus('${d.id}', this.checked)">
+                      <span class="slider-toggle good-bg"></span>
+                    </label>
+                  </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 8px; margin-top: 4px;">
+                  <div>
+                    <label style="font-size:10px; margin-bottom:2px;">Est. Time</label>
+                    <input type="text" value="${d.estimatedTime || '3 Days'}" style="padding:4px 8px; font-size:11px; width:80px;" onchange="updateEstTime('${d.id}', this.value)" />
+                  </div>
+                  <div>
+                    <label style="font-size:10px; margin-bottom:2px;">Recovered Amt (₹)</label>
+                    <input type="number" value="${d.recoveredAmount || 0}" style="padding:4px 8px; font-size:11px; width:90px;" onchange="updateRecoveredAmt('${d.id}', this.value, ${d.amount || 0})" />
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+
+          html += `
+            <div class="admin-user-card">
+              <div class="admin-user-header" onclick="toggleAdminCard(this)">
+                <div>
+                  <strong style="font-size: 15px; display: block; color: var(--text-main);">${info.userName}</strong>
+                  <span style="font-size: 12px; color: var(--accent-blue); font-weight: 600;">${info.userEmail}</span>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 14px; font-weight: 800; color: var(--text-main);">₹${userTotal.toLocaleString('en-IN')}</div>
+                  <span style="font-size: 11px; color: var(--text-muted);">${info.debtors.length} Debtors <i class="fa-solid fa-chevron-down" style="margin-left: 4px;"></i></span>
+                </div>
+              </div>
+              <div class="admin-user-body">
+                ${debtorsHtml}
+              </div>
+            </div>
+          `;
+        }
+
+        adminUsersContainer.innerHTML = html || `<p style="color:var(--text-muted); text-align:center;">No records found.</p>`;
+      } catch (err) {
+        adminUsersContainer.innerHTML = `<p style="color:var(--danger); text-align:center;">Error loading admin records.</p>`;
+      }
+    }
+
+    window.toggleAdminCard = function(headerElem) {
+      const bodyElem = headerElem.nextElementSibling;
+      bodyElem.classList.toggle("active");
+    };
+
+    window.toggleRecoveryStatus = async function(docId, newStatus) {
+      try {
+        const docRef = doc(db, "pending_recoveries", docId);
+        await updateDoc(docRef, { isRecovered: newStatus });
+        loadAdminData();
+      } catch (err) {
+        alert("Failed to update status: " + err.message);
+      }
+    };
+
+    window.updateEstTime = async function(docId, newTime) {
+      try {
+        const docRef = doc(db, "pending_recoveries", docId);
+        await updateDoc(docRef, { estimatedTime: newTime });
+      } catch (err) {
+        alert("Failed to update estimated time: " + err.message);
+      }
+    };
+
+    window.updateRecoveredAmt = async function(docId, newAmtStr, totalAmt) {
+      const newAmt = Number(newAmtStr);
+      if (newAmt > totalAmt) {
+        alert("Recovered amount cannot exceed total pending amount!");
+        loadAdminData();
+        return;
+      }
+      try {
+        const docRef = doc(db, "pending_recoveries", docId);
+        const isCompleted = newAmt >= totalAmt;
+        await updateDoc(docRef, { 
+          recoveredAmount: newAmt,
+          isRecovered: isCompleted
+        });
+        loadAdminData();
+      } catch (err) {
+        alert("Failed to update recovered amount: " + err.message);
+      }
+    };
+  </script>
+</body>
+</html>
