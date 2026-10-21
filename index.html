@@ -1194,6 +1194,9 @@
         authScreen.classList.add("hidden");
         adminScreen.classList.add("hidden");
         homeScreen.classList.remove("hidden");
+        if (new URLSearchParams(window.location.search).get("page") === "new-recovery") {
+  openNewRequestForm();
+        }
         loadUserStats();
         loadDebtorsToCache();
       } else {
