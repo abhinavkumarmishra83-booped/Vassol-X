@@ -1071,6 +1071,7 @@
     };
 
     window.openNewRequestForm = function() {
+      history.pushState({}, "", "?page=new-recovery");
       [homeScreen, reviewRequestsScreen, trackRecoveryScreen, supportScreen, accountScreen, adminScreen, moreSectionScreen, deleteRequestScreen].forEach(s => s.classList.add("hidden"));
       newRequestScreen.classList.remove("hidden");
       debtorForm.reset();
